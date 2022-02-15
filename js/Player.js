@@ -31,7 +31,7 @@ class Player {
         return tokens;
     }
 
-    checkTokens() {
-        return this.unusedTokens.length == 0 ? false : true;
+    unusedTokenCount() {
+        return this.unusedTokens.length !== 0;
     }
 }
