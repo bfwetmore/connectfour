@@ -16,13 +16,13 @@ class Space {
         if (this.token === null) {
             return null;
         }
-        return this.token.tokenOwner;
+        return this.token.owner;
     }
 
     /**
      * Draws SVG space
      */
-    drawSVGSpace() {
+    get drawSVGSpace() {
         const svgSpace = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         svgSpace.setAttributeNS(null, "id", this.id);
         svgSpace.setAttributeNS(null, "cx", (this.x * this.diameter) + this.radius);
@@ -30,8 +30,15 @@ class Space {
         svgSpace.setAttributeNS(null, "r", this.radius - 8);
         svgSpace.setAttributeNS(null, "fill", "black");
         svgSpace.setAttributeNS(null, "stroke", "none");
+        return svgSpace
 
-        document.getElementById("mask").appendChild(svgSpace);
+    }
+
+    /**
+     *
+     */
+    applySVGSpaces(){
+        document.getElementById("mask").appendChild(this.drawSVGSpace);
     }
 
     /**

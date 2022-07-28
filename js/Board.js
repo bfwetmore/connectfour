@@ -1,34 +1,40 @@
 class Board {
-    constructor() {
-        this.rows = 6;
-        this.columns = 7;
-        this.spaces = this.createSpaces();
+    constructor(rows = 6, columns = 7) {
+        this.rows = rows;
+        this.columns = columns;
+        this.spaces = [];
     }
 
     /**
      * Generates 2D array of spaces.
-     * @return  {Array}     An array of space objects
      */
-    createSpaces() {
-        const spaces = [];
-
+    _createSpaces() {
         for (let x = 0; x < this.columns; x++) {
             const column = [];
 
             for (let y = 0; y < this.rows; y++) {
-                const space = new Space(x, y);
-                column.push(space);
+                column.push(new Space(x, y));
             }
-            spaces.push(column);
+            this.spaces.push(column);
         }
-        return spaces;
     }
 
-    drawHTMLBoard() {
+    /**
+     * Draws the HTML Game Board with Spaces.
+     */
+    _drawHTMLBoard() {
         for (const column of this.spaces) {
             for (let space of column) {
-                space.drawSVGSpace();
+                space.applySVGSpaces();
             }
         }
+    }
+
+    /**
+     * Adds the spaces to the game board
+     */
+    drawBoardWithSpaces() {
+        this._createSpaces()
+        this._drawHTMLBoard()
     }
 }

@@ -36,9 +36,9 @@ class Token {
     /**
      * Moves html token one column.
      */
-    moveTokenLeft() {
+    moveTokenLeft(diameter) {
         if (this.columnLocation > 0) {
-            this.htmlTokenElement.style.left = this.offsetLeft - 76;
+            this.htmlTokenElement.style.left = this.offsetLeft - diameter;
             this.columnLocation -= 1;
         }
     }
@@ -47,9 +47,9 @@ class Token {
      * Moves html token one column to right
      * @param  columns - number of columns on the game board
      */
-    moveTokenRight(columns) {
+    moveTokenRight(columns, diameter) {
         if (this.columnLocation < columns - 1) {
-            this.htmlTokenElement.style.left = this.offsetLeft + 76;
+            this.htmlTokenElement.style.left = this.offsetLeft + diameter;
             this.columnLocation += 1;
         }
     }

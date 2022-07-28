@@ -1,46 +1,47 @@
 class Game {
-    constructor() {
-        this.board = new Board();
-        this.players = this.createPlayers();
+    /**
+     *
+     * @param board
+     * @param players
+     */
+    constructor(board, players) {
+        this.board = board;
+        this.players = players;
         this.ready = false;
     }
 
+    /**
+     * Retrieves the active player.
+     * @returns {*} Returns the active player.
+     */
     get activePlayer() {
         return this.players.find(player => player.active);
-    }
-
-    /**
-     * Creates two player objects
-     * @returns {Player[]} An array of two player objects.
-     */
-    createPlayers() {
-        return [new Player(prompt("Please enter Player 1 Name"), 1, "#e15258", true),
-            new Player(prompt("Please enter Player 2 Name"), 2, '#e59a13')];
     }
 
     /**
      * Creates the game board and draws first token.
      */
     startGame() {
-        this.board.drawHTMLBoard();
+        this.board.drawBoardWithSpaces();
         this.activePlayer.activeToken.drawHTMLTokenElement();
         this.ready = true;
     }
 
     /**
      * Branches code, depending on what key player presses
-     * @param e - Keydown event object
+     * @event document#keydown
+     * @type {KeyboardEvent}
      */
     moveTokenHandler(e) {
+        const space = new Space()
+        const diameter = space.diameter
         if (this.ready) {
             if (e.key === "ArrowLeft") {
-                this.activePlayer.activeToken.moveTokenLeft();
+                this.activePlayer.activeToken.moveTokenLeft(diameter);
             } else if (e.key === "ArrowRight") {
-                this.activePlayer.activeToken.moveTokenRight(this.board.columns);
-
+                this.activePlayer.activeToken.moveTokenRight(this.board.columns, diameter);
             } else if (e.key === "ArrowDown") {
                 this.playToken();
-
             }
         }
     }
@@ -76,57 +77,74 @@ class Game {
      * @return  {boolean}   Boolean value indicating whether the game has been won (true) or not (false)
      */
     checkForWin(target) {
-        const owner = target.token.tokenOwner;
-        let win = false;
+        let winCheck = [
+            this.checkVerticalWin,
+            this.checkHorizontalWin,
+            this.checkDiagonalRightWin,
+            this.checkDiagonalLeftWin
+        ];
+        for (let check of winCheck) {
+            if (check(target.token.owner, this.board.spaces, this.board.columns, this.board.rows) === true) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-        // vertical
-        for (let x = 0; x < this.board.columns; x++) {
-            for (let y = 0; y < this.board.rows - 3; y++) {
-                if (this.board.spaces[x][y].tokenOwner === owner &&
-                    this.board.spaces[x][y + 1].tokenOwner === owner &&
-                    this.board.spaces[x][y + 2].tokenOwner === owner &&
-                    this.board.spaces[x][y + 3].tokenOwner === owner) {
-                    win = true;
+    checkVerticalWin(owner, spaces, columns, rows) {
+        for (let x = 0; x < columns; x++) {
+            for (let y = 0; y < rows - 3; y++) {
+                if (spaces[x][y].tokenOwner === owner &&
+                    spaces[x][y + 1].tokenOwner === owner &&
+                    spaces[x][y + 2].tokenOwner === owner &&
+                    spaces[x][y + 3].tokenOwner === owner) {
+                    return true;
                 }
             }
         }
+        return false;
+    }
 
-        // horizontal
-        for (let x = 0; x < this.board.columns - 3; x++) {
-            for (let y = 0; y < this.board.rows; y++) {
-                if (this.board.spaces[x][y].tokenOwner === owner &&
-                    this.board.spaces[x + 1][y].tokenOwner === owner &&
-                    this.board.spaces[x + 2][y].tokenOwner === owner &&
-                    this.board.spaces[x + 3][y].tokenOwner === owner) {
-                    win = true;
+    checkHorizontalWin(owner, spaces, columns, rows) {
+        for (let x = 0; x < columns - 3; x++) {
+            for (let y = 0; y < rows; y++) {
+                if (spaces[x][y].tokenOwner === owner &&
+                    spaces[x + 1][y].tokenOwner === owner &&
+                    spaces[x + 2][y].tokenOwner === owner &&
+                    spaces[x + 3][y].tokenOwner === owner) {
+                    return true;
                 }
             }
         }
+        return false;
+    }
 
-        // diagonal bottom right top left
-        for (let x = 3; x < this.board.columns; x++) {
-            for (let y = 0; y < this.board.rows - 3; y++) {
-                if (this.board.spaces[x][y].tokenOwner === owner &&
-                    this.board.spaces[x - 1][y + 1].tokenOwner === owner &&
-                    this.board.spaces[x - 2][y + 2].tokenOwner === owner &&
-                    this.board.spaces[x - 3][y + 3].tokenOwner === owner) {
-                    win = true;
+    checkDiagonalRightWin(owner, spaces, columns, rows) {
+        for (let x = 3; x < columns; x++) {
+            for (let y = 0; y < rows - 3; y++) {
+                if (spaces[x][y].tokenOwner === owner &&
+                    spaces[x - 1][y + 1].tokenOwner === owner &&
+                    spaces[x - 2][y + 2].tokenOwner === owner &&
+                    spaces[x - 3][y + 3].tokenOwner === owner) {
+                    return true;
                 }
             }
         }
+        return false;
+    }
 
-        // diagonal bottom left top right
-        for (let x = 3; x < this.board.columns; x++) {
-            for (let y = 3; y < this.board.rows; y++) {
-                if (this.board.spaces[x][y].tokenOwner === owner &&
-                    this.board.spaces[x - 1][y - 1].tokenOwner === owner &&
-                    this.board.spaces[x - 2][y - 2].tokenOwner === owner &&
-                    this.board.spaces[x - 3][y - 3].tokenOwner === owner) {
-                    win = true;
+    checkDiagonalLeftWin(owner, spaces, columns, rows) {
+        for (let x = 3; x < columns; x++) {
+            for (let y = 3; y < rows; y++) {
+                if (spaces[x][y].tokenOwner === owner &&
+                    spaces[x - 1][y - 1].tokenOwner === owner &&
+                    spaces[x - 2][y - 2].tokenOwner === owner &&
+                    spaces[x - 3][y - 3].tokenOwner === owner) {
+                    return true;
                 }
             }
         }
-        return win;
+        return false;
     }
 
     /**
@@ -155,7 +173,6 @@ class Game {
      */
     updateGameState(token, target) {
         target.markFilledSpace(token);
-        console.log(this.checkForWin(target));
         if (this.checkForWin(target)) {
             return this.gameOver(`${this.activePlayer.name} has won the game!`);
         }
@@ -165,7 +182,5 @@ class Game {
         }
         this.activePlayer.activeToken.drawHTMLTokenElement();
         this.ready = true;
-
     }
-
 }
